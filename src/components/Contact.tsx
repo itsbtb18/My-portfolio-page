@@ -1,19 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SectionHeading from './SectionHeading';
 import AnimatedText from './AnimatedText';
 import { Mail, Phone, MapPin, Github, Linkedin } from 'lucide-react';
 
 const Contact: React.FC = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+    setIsSubmitting(true);
+
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
+    const name = formData.get('name');
     const email = formData.get('email');
     const subject = formData.get('subject');
     const message = formData.get('message');
     
-    window.location.href = `mailto:ma.bettayeb@esi-sba.dz?subject=${subject}&body=${message}`;
+    const mailBody = `
+Name: ${name}
+Email: ${email}
+
+Message:
+${message}
+    `;
+    
+    window.location.href = `mailto:ma.bettayeb@esi-sba.dz?subject=${encodeURIComponent(subject as string)}&body=${encodeURIComponent(mailBody)}`;
+    
+    form.reset();
+    setIsSubmitting(false);
   };
 
   return (
@@ -154,8 +169,9 @@ const Contact: React.FC = () => {
                 <button
                   type="submit"
                   className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium"
+                  disabled={isSubmitting}
                 >
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </AnimatedText>
             </form>
